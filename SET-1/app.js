@@ -162,9 +162,14 @@ const processData = async (env, url) => {
                   if ($(p_ele).hasClass("advertise-line")) {
                     return;
                   }
+
+                  if ($(p_ele).parent(".disclaimer").parent('div').hasClass("author-container")) {
+                    return;
+                  }
                   let num_tags =
                     $(ele).find("p").length +
-                    $(ele).find(".img-responsive").length;
+                    $(ele).find(".img-responsive").length +
+                    $(ele).find("ul").length;
 
                   (function(i) {
                     let interval = setTimeout(async function() {

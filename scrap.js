@@ -88,12 +88,23 @@ async function createMetatags(env, title, description) {
   });
 }
 
-async function createAuthor(env, name) {
+async function createAuthor(env, name, altText, imgLink) {
+
+  let block = await createImage(altText, imgLink)
+
+
   return await env.createEntry("titleImage", {
     fields: {
       "title": {
         'en-US': name
-      }
+      },
+       "image": {
+        sys: {
+          id: block.sys.id,
+          linkType: "Entry",
+          type: "Link"
+        }
+       } 
     }
   });
 }
