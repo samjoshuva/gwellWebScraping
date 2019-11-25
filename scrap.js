@@ -5,50 +5,30 @@ const client = createClient({
   accessToken: config.accessToken
 });
 
-const init = async () => {
-  try {
-    const space = await client.getSpace(config.spaceId);
-
-    const env = await space.getEnvironment(config.envId);
-
-    // const Articles = await env.getContentType("article")
-    // const Image = await env.getContentType("imageLink")
 
 
+async function createArticle(env, title,slug, description , image, contentType, contentBlocks = [], metaTags, source, authors = [],date,  tags = [], featured = false, references) {
 
-    createArticle(env);
-
-    console.log("Update was successful");
-
-
-  } catch (err) {
-    console.log(err);
-  }
-};
-
-// init();
-
-
-async function createArticle(env, title, description = null, image, contentType, contentBlocks = [], metaTags = null, source, authors = [], tags = [], featured = false, references) {
-
-  console.log(title)
 
   return await env.createEntry('article', {
     fields: {
       "title": {
         'en-US': title
       },
-      // "metaTags": {
-      //   'en-US': metaTags
-      // },
+      "slug": {
+        'en-US': slug
+      },
+      "metaTags": {
+        'en-US': metaTags
+      },
       // "authors": {
       //   'en-US': authors
       // }
 
       // ,
-      // "description": {
-      //   'en-US': description
-      // },
+      "description": {
+        'en-US': description
+      },
       "image": {
         'en-US': image
       },
@@ -60,7 +40,7 @@ async function createArticle(env, title, description = null, image, contentType,
         'en-US': source
       },
       "publishDate": {
-        'en-US': new Date()
+        'en-US': date
       },
       "tags": {
         "en-US": tags
@@ -95,6 +75,19 @@ async function createImage(env, altText, link) {
   return await image;
 }
 
+async function createMetatags(env, title, description) {
+  return await env.createEntry("metaTags", {
+    fields: {
+      "title": {
+        'en-US': title
+      },
+      "description": {
+        'en-US': description
+      }
+    }
+  });
+}
+
 async function createAuthor(env, name) {
   return await env.createEntry("titleImage", {
     fields: {
@@ -107,7 +100,6 @@ async function createAuthor(env, name) {
 
 async function createContentBlocks(env, title = null, copy = null) {
 
-
   return await env.createEntry("titleCopyImageLinkCaption", {
     fields: {
       "title": {
@@ -118,10 +110,24 @@ async function createContentBlocks(env, title = null, copy = null) {
       }
     }
   });
+}
 
+async function createContentBlocksVideos(env, altText = null, videoUrl = null, videoId=null) {
 
+  return await env.createEntry("videoLink", {
+    fields: {
+      "altText": {
+        'en-US': altText
+      },
+      "videoUrl": {
+        'en-US': videoUrl
+      },
+      "videoId": {
+        'en-US': videoId
+      }
 
-
+    }
+  });
 }
 
 
@@ -130,5 +136,7 @@ module.exports = {
   createArticle,
   createImage,
   createContentBlocks,
-  createAuthor
+  createAuthor,
+  createMetatags,
+  createContentBlocksVideos,
 }
