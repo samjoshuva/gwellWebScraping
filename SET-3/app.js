@@ -53,7 +53,7 @@ const processData = async (env, url) => {
     const $ = cheerio.load(data);
 
     let title;
-    let metaDescription = [];
+    let metaDescription;
     let tags = [];
     let description;
     let date;
@@ -88,32 +88,23 @@ const processData = async (env, url) => {
         title = $(ele)
           .attr("content")
           .trim();
-
-        const metaTags = await createMetatags(env, "og:title", title);
-        metaDescription.push({
-          sys: {
-            id: metaTags.sys.id,
-            linkType: "Entry",
-            type: "Link"
-          }
-        });
       }
 
       if ($(ele).attr("name") == "description") {
         const metaTags = await createMetatags(
           env,
-          "description",
+          title,
           $(ele)
             .attr("content")
             .trim()
         );
-        metaDescription.push({
+        metaDescription = {
           sys: {
             id: metaTags.sys.id,
             linkType: "Entry",
             type: "Link"
           }
-        });
+        };
       }
 
       if ($(ele).attr("property") == "article:tag") {
@@ -123,13 +114,13 @@ const processData = async (env, url) => {
             .trim()
         );
       }
-      // if ($(ele).attr("property") == "article:section") {
-      //   tags.push(
-      //     $(ele)
-      //       .attr("content")
-      //       .trim()
-      //   );
-      // }
+      if ($(ele).attr("property") == "article:section") {
+        tags.push(
+          $(ele)
+            .attr("content")
+            .trim()
+        );
+      }
 
       if ($(ele).attr("property") == "og:description") {
         description = $(ele)
@@ -169,7 +160,7 @@ const processData = async (env, url) => {
             .children(".row")
             .each(async (num_row, ele) => {
               $(ele)
-                .find("p, h2,.img-responsive, ul, ol")
+                .find("p, h1,  h2,.img-responsive, ul, ol")
                 .each(async (pi, p_ele) => {
                   if ($(p_ele).hasClass("advertise-line")) {
                     return;
@@ -180,6 +171,7 @@ const processData = async (env, url) => {
                   }
                   let num_tags =
                     $(ele).find("p").length +
+                    $(ele).find("h1").length +
                     $(ele).find("h2").length +
                     $(ele).find(".img-responsive").length +
                     $(ele).find("ul").length +
